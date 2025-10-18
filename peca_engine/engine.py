@@ -1,8 +1,12 @@
 # === PECA_ENGINE (Motor de Debate Causal Real) ===
+# === PECA_ENGINE (Motor de Debate Causal Real) ===
 import re
 import google.generativeai as genai
+import os
 
-from google.genai.errors import APIError
+# Configurar la API de Gemini desde las variables de entorno (Render + Environment)
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
 
 # === 1. ENTIDADES CAUSALES ===
 class EntidadCausal:
