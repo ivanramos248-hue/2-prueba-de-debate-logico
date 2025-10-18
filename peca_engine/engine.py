@@ -5,81 +5,88 @@ from google.genai.errors import APIError
 
 # === 1. ENTIDADES CAUSALES ===
 class EntidadCausal:
-    def __init__(self, nombre, principio: str):
+    def __init__(self, self_id, nombre, principio):
+        self.id = self_id
         self.nombre = nombre
         self.principio = principio
 
-    def generar_prompt_tesis(self, self_prompt, pregunta: str) -> str:
+    def generar_prompt(self, pregunta, contexto=""):
+        """Genera la tesis inicial de la entidad basada en su principio."""
         return (
-            f"Actúa como la entidad {self.nombre}.\n"
-            f"Tu principio es: {self.principio}.\n"
-            f"La pregunta en debate es: '{pregunta}'.\n"
-            f"Responde con una tesis clara y coherente basada en tu principio.\n"
-            f"Usa el formato: [TESIS {self.nombre.upper()}]: ..."
+            f"Soy {self.nombre}. Mi principio rector es: '{self.principio}'. "
+            f"Debato sobre: '{pregunta}'. "
+            f"{contexto} "
+            "Ofreceré un razonamiento breve y lógico que respalde mi postura.\n"
         )
 
-# Definición de entidades del debate
-CRONO = EntidadCausal("CRONO", "Máxima Causalidad y Mínima Fricción del Tiempo (MCT)")
-AEON = EntidadCausal("AEON", "Ley de Reversibilidad Identitaria (LRI)")
-MOROS = EntidadCausal("MOROS", "Ley de Transferencia de Memoria Causal (LTMC)")
+
+# === 2. CONFIGURAR ENTIDADES ===
+CRONO = EntidadCausal("CRONO", "CRONO", "Máxima Causalidad y Mínima Fricción del Tiempo (MCT)")
+AEON = EntidadCausal("AEON", "AEON", "Ley de Reversibilidad Identitaria (LRI)")
+MOROS = EntidadCausal("MOROS", "MOROS", "Ley de Transferencia de Memoria Causal (LTMC)")
 
 ENTIDADES = [CRONO, AEON, MOROS]
-ENTIDADES_DICT = {e.nombre.lower(): e for e in ENTIDADES}
 
-# === 2. PARSER DE TESIS ===
-def extraer_tesis(texto_completo: str):
-    """Extrae las tesis generadas por las entidades del texto."""
-    tesis = {}
-    for entidad in ENTIDADES:
-        patron = re.compile(rf"\[TESIS {entidad.nombre.upper()}\]: (.*?)($|\[FIN TESIS)", re.S)
-        match = patron.search(texto_completo)
-        if match:
-            tesis[entidad.nombre] = match.group(1).strip()
-    return tesis
 
-# === 3. MOTOR DE DEBATE ===
-def iniciar_red_de_debate(pregunta: str) -> str:
-    """
-    Ejecuta un debate entre tres entidades (CRONO, AEON, MOROS)
-    y genera una conclusión consensuada.
-    """
+# === 3. FUNCIONES AUXILIARES ===
+def generar_respuesta(entidad, cliente, pregunta, contexto=""):
+    """Llama a la API de Gemini para generar una respuesta de la entidad."""
+    prompt = entidad.generar_prompt(pregunta, contexto)
     try:
-        client = genai.Client(api_key="AIzaSyCvAk9upRRvxNfQoeBbR_cs6Ffmm17DRvU")
-
-        print("⚙️ Iniciando debate entre CRONO, AEON y MOROS...")
-
-        # 1. Generar tesis individuales
-        respuestas = []
-        for entidad in ENTIDADES:
-            prompt = entidad.generar_prompt_tesis(entidad.principio, pregunta)
-            print(f"🧠 Generando tesis para {entidad.nombre}...")
-            resp = client.models.generate(
-                model="gemini-2.0-flash",
-                contents=prompt
-            )
-            texto = resp.text.strip()
-            respuestas.append(f"[TESIS {entidad.nombre.upper()}]: {texto} [FIN TESIS]")
-        
-        debate_texto = "\n\n".join(respuestas)
-
-        # 2. Generar conclusión final
-        prompt_conclusion = (
-            f"Analiza las siguientes tres tesis de entidades causales:\n\n{debate_texto}\n\n"
-            f"Genera una conclusión final consensuada entre CRONO, AEON y MOROS, "
-            f"resumiendo los puntos en común y destacando la convergencia lógica. "
-            f"Formato: [CONCLUSION]: ..."
+        response = cliente.models.generate_content(
+            model="gemini-1.5-flash",
+            contents=prompt
         )
-
-        print("🧩 Generando conclusión consensuada...")
-        resp_final = client.models.generate(
-            model="gemini-2.0-flash",
-            contents=prompt_conclusion
-        )
-        conclusion = resp_final.text.strip()
-
-        return f"{debate_texto}\n\n{conclusion}"
-
+        return response.text.strip()
     except APIError as e:
-        return f"Error del modelo: {e}"
-    except Exception as e:
-        return f"Ocurrió un error inesperado: {e}"
+        return f"[Error con {entidad.nombre}: {e}]"
+
+
+def construir_dialogo(pregunta, respuestas_previas):
+    """Crea un resumen de las respuestas anteriores para contextualizar la conversación."""
+    contexto = "Resumen del debate hasta ahora:\n"
+    for entidad, respuesta in respuestas_previas.items():
+        contexto += f"{entidad}: {respuesta}\n"
+    contexto += "\nResponde con base en este contexto y añade tu razonamiento.\n"
+    return contexto
+
+
+# === 4. FUNCIÓN PRINCIPAL ===
+def iniciar_red_de_debate(pregunta):
+    """Ejecuta el ciclo completo del debate causal entre las tres entidades."""
+    cliente = genai.Client(api_key="AIZAisyCvAk9URpRWuQfoQBeBR_cS6fFmmt7DRVU")  # 👈 Tu API Key
+
+    debate = {}
+    contexto = ""
+
+    # Paso 1: cada entidad da su postura inicial
+    for entidad in ENTIDADES:
+        debate[entidad.nombre] = generar_respuesta(entidad, cliente, pregunta, contexto)
+        contexto = construir_dialogo(pregunta, debate)
+
+    # Paso 2: generación de conclusión final consensuada
+    prompt_final = (
+        "Tres inteligencias (CRONO, AEON y MOROS) han debatido sobre una pregunta. "
+        "A continuación se resumen sus respuestas:\n\n"
+        f"{contexto}\n"
+        "Ahora, como moderador neutral, sintetiza sus ideas en una conclusión final "
+        "que refleje los puntos de coincidencia más profundos y lógicos entre las tres posturas."
+    )
+
+    try:
+        conclusion = cliente.models.generate_content(
+            model="gemini-1.5-flash",
+            contents=prompt_final
+        )
+        conclusion_texto = conclusion.text.strip()
+    except APIError as e:
+        conclusion_texto = f"[Error al generar la conclusión: {e}]"
+
+    # Paso 3: devolver el resultado completo
+    resultado = {
+        "pregunta": pregunta,
+        "respuestas": debate,
+        "conclusion": conclusion_texto
+    }
+    return resultado
+
