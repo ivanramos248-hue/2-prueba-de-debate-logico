@@ -9,9 +9,9 @@ if not API_KEY:
 
 # Configurar cliente Gemini
 genai.configure(api_key=API_KEY)
-MODEL = "gemini-1.5-flash"
+MODEL = "gemini-1.5-pro-latest"
 
-# --- CLASES ---
+# === CLASES ===
 class EntidadCausal:
     def __init__(self, id_name, nombre, principio):
         self.id = id_name
@@ -26,32 +26,31 @@ CRONO = EntidadCausal("crono", "CRONO", "Máxima Causalidad y Mínima Fricción"
 AEON = EntidadCausal("aeon", "AEON", "Ley de Reversibilidad Entrópica (LRE)")
 MOROS = EntidadCausal("moros", "MOROS", "Ley de Transferencia de Memoria Causal (LTMC)")
 
-# --- FUNCIÓN PRINCIPAL ---
+# === FUNCIÓN PRINCIPAL ===
 def iniciar_red_de_debate(pregunta):
     """
-    Lógica completa del debate y la conclusión generada por Gemini.
+    Genera la conversación de debate entre las tres entidades usando Gemini.
     """
     debate_prompt = f"""
-    Tres entidades — CRONO, AEON y MOROS — están debatiendo sobre la siguiente pregunta:
-    "{pregunta}"
+    Imagina un debate filosófico entre tres entidades lógicas:
+    - {CRONO.nombre}: representa la {CRONO.principio}.
+    - {AEON.nombre}: representa la {AEON.principio}.
+    - {MOROS.nombre}: representa la {MOROS.principio}.
 
-    Cada una debe presentar su postura basada en su principio.
-    Luego, generen un intercambio corto entre ellas y terminen con una CONCLUSIÓN FINAL UNIFICADA.
+    Tema del debate: "{pregunta}"
 
-    Principios:
-    - CRONO: Máxima Causalidad y Mínima Fricción
-    - AEON: Ley de Reversibilidad Entrópica (LRE)
-    - MOROS: Ley de Transferencia de Memoria Causal (LTMC)
-
-    Formato de salida:
-    🌀 [Inicio del Debate]
-    💬 CRONO: ...
-    💬 AEON: ...
-    💬 MOROS: ...
-    🔄 Interacción entre ellos (máximo 3 turnos)
-    🧠 Conclusión Final: ...
+    Cada entidad debe argumentar desde su principio lógico.
+    Finaliza con una breve conclusión integradora.
     """
 
-    model = genai.GenerativeModel(MODEL)
-    respuesta = model.generate_content(debate_prompt)
-    return respuesta.text
+    try:
+        model = genai.GenerativeModel(MODEL)
+        response = model.generate_content(debate_prompt)
+
+        if response and response.text:
+            return response.text
+        else:
+            return "⚠️ No se recibió respuesta del modelo."
+
+    except Exception as e:
+        return f"❌ Error interno: {str(e)}"
