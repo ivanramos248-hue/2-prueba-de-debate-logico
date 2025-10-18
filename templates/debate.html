@@ -3,97 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Debate Lógico en Acción</title>
+    <title>Debate Lógico IA vs Humano</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #f4f4f4;
-            font-family: "Segoe UI", sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            width: 90%;
-            max-width: 800px;
-            margin: 30px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 0 12px rgba(0,0,0,0.1);
-        }
-        h2 {
-            text-align: center;
-            color: #333;
-        }
-        .botones {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        button {
-            background-color: #0078d4;
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #005fa3;
-        }
-        #debate {
-            background: #f9f9f9;
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 10px;
-            min-height: 200px;
-            overflow-y: auto;
-        }
-        .mensaje {
-            margin-bottom: 12px;
-        }
-        .cron {
-            color: #e67e22;
-            font-weight: bold;
-        }
-        .aeon {
-            color: #27ae60;
-            font-weight: bold;
-        }
-        .moros {
-            color: #2980b9;
-            font-weight: bold;
-        }
+        body { background-color: #f5f5f5; }
+        .container { max-width: 800px; margin-top: 60px; }
+        .card { border-radius: 15px; }
+        .mensaje { margin-bottom: 10px; }
+        .usuario { color: #0d6efd; }
+        .ia { color: #198754; }
+        .titulo { font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>🧠 Debate Lógico IA vs Humano</h2>
-        <div class="botones">
-            <button onclick="iniciarDebate()">Iniciar Debate</button>
-            <button onclick="limpiar()">Limpiar</button>
-        </div>
-        <div id="debate">
-            <p>Haz clic en “Iniciar Debate” para comenzar la simulación.</p>
+        <div class="card shadow p-4">
+            <h2 class="text-center mb-4">🧠 Debate Lógico: Humano vs IA</h2>
+            <div id="debateBox" class="border p-3 mb-3" style="height: 300px; overflow-y: auto; background: white;">
+                <p class="text-muted">Escribe tu idea y observa cómo responden los pensadores lógicos...</p>
+            </div>
+            <div class="input-group">
+                <input type="text" id="userInput" class="form-control" placeholder="Escribe tu argumento aquí...">
+                <button class="btn btn-primary" id="sendBtn">Enviar</button>
+                <button class="btn btn-secondary" id="clearBtn">Limpiar</button>
+            </div>
         </div>
     </div>
 
     <script>
-        async function iniciarDebate() {
-            const resp = await fetch('/iniciar', { method: 'POST' });
-            const data = await resp.json();
-            document.getElementById('debate').innerHTML = '';
-            data.forEach(m => {
-                const div = document.createElement('div');
-                div.className = 'mensaje';
-                div.innerHTML = `<span class="${m.orador.toLowerCase()}">${m.orador}:</span> ${m.texto}`;
-                document.getElementById('debate').appendChild(div);
-            });
-        }
+        const sendBtn = document.getElementById("sendBtn");
+        const clearBtn = document.getElementById("clearBtn");
+        const input = document.getElementById("userInput");
+        const box = document.getElementById("debateBox");
 
-        function limpiar() {
-            document.getElementById('debate').innerHTML = '<p>Haz clic en “Iniciar Debate” para comenzar la simulación.</p>';
-        }
+        sendBtn.onclick = async () => {
+            const texto = input.value.trim();
+            if (!texto) return;
+
+            box.innerHTML += `<p class='mensaje usuario'><strong>Tú:</strong> ${texto}</p>`;
+            input.value = '';
+
+            const response = await fetch('/responder', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ texto })
+            });
+
+            const data = await response.json();
+            for (const [nombre, frase] of Object.entries(data)) {
+                box.innerHTML += `<p class='mensaje ia'><strong>${nombre}:</strong> ${frase}</p>`;
+            }
+
+            box.scrollTop = box.scrollHeight;
+        };
+
+        clearBtn.onclick = () => {
+            box.innerHTML = '<p class="text-muted">Escribe tu idea y observa cómo responden los pensadores lógicos...</p>';
+        };
     </script>
 </body>
 </html>
