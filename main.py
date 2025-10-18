@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import random
+from peca_engine import iniciar_red_de_debate
+API_KEY = "AIzaSyCvAk9upRRvxNfQoeBbR_cs6Ffmm17DRvU"
 
 app = Flask(__name__)
 
