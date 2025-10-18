@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: 2-prueba-de-debate-logico
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn main:app
+    plan: free
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
