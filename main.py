@@ -50,4 +50,4 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "🤖 PECA: Sistema de Debate Lógico entre
+    return "🤖 PECA: Sistema de Debate Lógico entre humanos e IA"
