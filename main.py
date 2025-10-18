@@ -1,26 +1,20 @@
 # === main.py ===
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request
 from peca_engine.engine import iniciar_red_de_debate
 
 app = Flask(__name__)
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def home():
-    return render_template("index.html")
+    debate_result = ""
+    pregunta = ""
 
-@app.route("/debate", methods=["POST"])
-def debate():
-    data = request.get_json()
-    pregunta = data.get("pregunta", "").strip()
+    if request.method == "POST":
+        pregunta = request.form["pregunta"]
+        if pregunta.strip():
+            debate_result = iniciar_red_de_debate(pregunta)
 
-    if not pregunta:
-        return jsonify({"error": "⚠️ Ingresa un tema para debatir."}), 400
-
-    try:
-        resultado = iniciar_red_de_debate(pregunta)
-        return jsonify({"resultado": resultado})
-    except Exception as e:
-        return jsonify({"error": f"❌ Error interno: {str(e)}"}), 500
+    return render_template("index.html", debate_result=debate_result, pregunta=pregunta)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    app.run(host="0.0.0.0", port=5000)
