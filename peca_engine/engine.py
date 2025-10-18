@@ -1,6 +1,7 @@
 # === PECA_ENGINE (Motor de Debate Causal Real) ===
 import re
-from google import genai
+import google.generativeai as genai
+
 from google.genai.errors import APIError
 
 # === 1. ENTIDADES CAUSALES ===
