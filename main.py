@@ -1,3 +1,4 @@
+
 from flask import Flask, render_template, request
 import google.generativeai as genai
 import os
@@ -13,8 +14,8 @@ class EntidadCausal:
 
     def generar_tesis(self, pregunta):
         prompt = (
-            f"Actúa como la entidad ({self.nombre}), guiada por el principio ({self.principio}). "
-            f"Responde de forma clara y lógica a la siguiente pregunta:\n\n"
+            f"Actúa como la entidad {self.nombre}, guiada por el principio '{self.principio}'. "
+            f"Responde a la siguiente pregunta de forma lógica, concisa y filosófica.\n\n"
             f"Pregunta: {pregunta}"
         )
 
@@ -27,26 +28,28 @@ CRONO = EntidadCausal("CRONO", "tiempo y consecuencia")
 AEON = EntidadCausal("AEON", "equilibrio y permanencia")
 MOROS = EntidadCausal("MOROS", "inevitabilidad y destino")
 
-# === 4. Función de debate lógico ===
-def debate_logico(pregunta):
-    return {
-        "pregunta": pregunta,
-        "CRONO": CRONO.generar_tesis(pregunta),
-        "AEON": AEON.generar_tesis(pregunta),
-        "MOROS": MOROS.generar_tesis(pregunta)
-    }
-
-# === 5. Servidor Flask ===
+# === 4. Configurar Flask ===
 app = Flask(__name__)
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/")
 def home():
-    if request.method == "POST":
-        pregunta = request.form["pregunta"]
-        resultado = debate_logico(pregunta)
-        return render_template("index.html", resultado=resultado)
-    return render_template("index.html", resultado=None)
+    return render_template("index.html")
+
+@app.route("/debatir", methods=["POST"])
+def debatir():
+    pregunta = request.form["pregunta"]
+
+    t_crono = CRONO.generar_tesis(pregunta)
+    t_aeon = AEON.generar_tesis(pregunta)
+    t_moros = MOROS.generar_tesis(pregunta)
+
+    return render_template(
+        "resultado.html",
+        pregunta=pregunta,
+        crono=t_crono,
+        aeon=t_aeon,
+        moros=t_moros
+    )
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
-
