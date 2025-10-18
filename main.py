@@ -1,55 +1,44 @@
+from flask import Flask, render_template, jsonify, request
+import random
 
-from flask import Flask, render_template, request
-import google.generativeai as genai
-import os
-
-# === 1. Configuración de la API de Google ===
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-
-# === 2. Clase para generar tesis ===
-class EntidadCausal:
-    def __init__(self, nombre, principio):
-        self.nombre = nombre
-        self.principio = principio
-
-    def generar_tesis(self, pregunta):
-        prompt = (
-            f"Actúa como la entidad {self.nombre}, guiada por el principio '{self.principio}'. "
-            f"Responde a la siguiente pregunta de forma lógica, concisa y filosófica.\n\n"
-            f"Pregunta: {pregunta}"
-        )
-
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        respuesta = model.generate_content(prompt)
-        return respuesta.text.strip()
-
-# === 3. Crear entidades ===
-CRONO = EntidadCausal("CRONO", "tiempo y consecuencia")
-AEON = EntidadCausal("AEON", "equilibrio y permanencia")
-MOROS = EntidadCausal("MOROS", "inevitabilidad y destino")
-
-# === 4. Configurar Flask ===
 app = Flask(__name__)
 
-@app.route("/")
-def home():
-    return render_template("index.html")
+# Ruta principal (pantalla de bienvenida)
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-@app.route("/debatir", methods=["POST"])
-def debatir():
-    pregunta = request.form["pregunta"]
+# Ruta para mostrar la plantilla del debate
+@app.route('/debate')
+def debate():
+    return render_template('debate.html')
 
-    t_crono = CRONO.generar_tesis(pregunta)
-    t_aeon = AEON.generar_tesis(pregunta)
-    t_moros = MOROS.generar_tesis(pregunta)
+# Ruta para simular el debate entre las IAs
+@app.route('/iniciar', methods=['POST'])
+def iniciar_debate():
+    cronos = [
+        "El tiempo es un recurso que determina la lógica de nuestras decisiones.",
+        "Toda acción humana está sujeta al orden temporal del pensamiento.",
+        "Reflexionemos sobre cómo el tiempo influye en la razón."
+    ]
+    aeon = [
+        "El razonamiento trasciende el tiempo cuando buscamos la verdad absoluta.",
+        "El conocimiento no depende de la secuencia, sino de la conexión entre ideas.",
+        "El pensamiento lógico es atemporal, aunque se exprese en el presente."
+    ]
+    moros = [
+        "La consecuencia de no razonar lógicamente es el caos argumentativo.",
+        "Sin estructura lógica, el diálogo se convierte en ruido.",
+        "Toda verdad carece de sentido sin el peso de la deducción correcta."
+    ]
 
-    return render_template(
-        "resultado.html",
-        pregunta=pregunta,
-        crono=t_crono,
-        aeon=t_aeon,
-        moros=t_moros
-    )
+    debate = [
+        {"orador": "CRONO", "texto": random.choice(cronos)},
+        {"orador": "AEON", "texto": random.choice(aeon)},
+        {"orador": "MOROS", "texto": random.choice(moros)}
+    ]
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    return jsonify(debate)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=10000)
