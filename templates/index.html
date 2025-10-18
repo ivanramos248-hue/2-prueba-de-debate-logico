@@ -1,151 +1,26 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌌 Debate Lógico Cósmico - CRONO · AEON · MOROS</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
-
-        body {
-            font-family: 'Orbitron', sans-serif;
-            color: #e0e0ff;
-            text-align: center;
-            padding: 40px;
-            overflow-x: hidden;
-            overflow-y: auto;
-            height: 100vh;
-            background: radial-gradient(circle at center, #050505, #0a0a2a, #000);
-            position: relative;
-        }
-
-        /* === Fondo animado de estrellas === */
-        .stars {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: -1;
-            background: transparent;
-            overflow: hidden;
-        }
-
-        .star {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle 3s infinite ease-in-out;
-            opacity: 0.8;
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.1; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.5); }
-        }
-
-        /* Generación aleatoria de estrellas */
-        {% for i in range(100) %}
-        .star:nth-child({{ i }}) {
-            top: {{ (i * 9) % 100 }}%;
-            left: {{ (i * 37) % 100 }}%;
-            animation-delay: {{ (i * 0.2) % 3 }}s;
-        }
-        {% endfor %}
-
-        /* === Contenido principal === */
-        h1 {
-            color: #0fffc1;
-            text-shadow: 0 0 20px #00ffe5, 0 0 40px #00f7ff;
-            font-size: 2.4em;
-            margin-bottom: 20px;
-        }
-
-        .container {
-            background: rgba(10, 10, 30, 0.85);
-            border: 2px solid #0fffc1;
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 850px;
-            margin: auto;
-            box-shadow: 0 0 40px #00ffe5;
-        }
-
-        textarea {
-            width: 90%;
-            height: 100px;
-            margin: 15px 0;
-            border-radius: 10px;
-            border: 1px solid #00ffe5;
-            background: rgba(10, 10, 30, 0.9);
-            color: #fff;
-            padding: 10px;
-            font-size: 1em;
-            resize: none;
-        }
-
-        button {
-            background-color: #00ffe5;
-            color: #000;
-            font-size: 1.1em;
-            padding: 10px 25px;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        button:hover {
-            background-color: #0fffc1;
-            transform: scale(1.05);
-        }
-
-        .resultado {
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 25px;
-            margin-top: 25px;
-            text-align: left;
-            font-family: 'Courier New', monospace;
-            color: #c7faff;
-            line-height: 1.6em;
-            white-space: pre-wrap;
-        }
-
-        footer {
-            margin-top: 30px;
-            color: #888;
-            font-size: 0.9em;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌌 Debate Cósmico - PECA</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <!-- Fondo estelar animado -->
-    <div class="stars">
-        {% for i in range(100) %}
-        <div class="star"></div>
-        {% endfor %}
+  <div class="nebulosa"></div>
+  <div class="contenedor">
+    <h1>🌠 Debate Cósmico</h1>
+    <form method="POST">
+      <input type="text" name="tema" placeholder="Escribe un tema profundo..." required>
+      <button type="submit">Iniciar Debate</button>
+    </form>
+
+    {% if debate %}
+    <div class="debate">
+      <h2>✨ Resultado del Debate</h2>
+      <p>{{ debate|safe }}</p>
     </div>
-
-    <h1>🧠 Debate Lógico Cósmico - CRONO · AEON · MOROS</h1>
-    <div class="container">
-        <form method="POST">
-            <p><strong>Introduce un tema para el debate:</strong></p>
-            <textarea name="pregunta" placeholder="Ejemplo: ¿El tiempo es una ilusión o una propiedad del cosmos?">{{ pregunta }}</textarea>
-            <br>
-            <button type="submit">Iniciar Debate</button>
-        </form>
-
-        {% if debate_result %}
-        <div class="resultado">
-            <h3>💫 Resultado del Debate:</h3>
-            <p>{{ debate_result|safe }}</p>
-        </div>
-        {% endif %}
-    </div>
-
-    <footer>Versión 1.6 · Fondo Estelar Animado · © Consejo Causal del Cosmos</footer>
+    {% endif %}
+  </div>
 </body>
 </html>
