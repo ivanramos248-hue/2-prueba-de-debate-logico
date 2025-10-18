@@ -1,17 +1,11 @@
-# === PECA: Sistema de Debate Lógico entre Entidades Causales ===
-# Versión lista para Render.com
-# Autor: Iván Ramos + Asistente GPT-5
-
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request
 import google.generativeai as genai
 import os
 
-# === 1. Configuración de la API ===
-# Reemplaza el texto entre comillas con tu API Key de Gemini
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "TU_API_KEY_AQUI")
-genai.configure(api_key=GEMINI_API_KEY)
+# === 1. Configuración de la API de Google ===
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
-# === 2. Definición de entidades ===
+# === 2. Clase para generar tesis ===
 class EntidadCausal:
     def __init__(self, nombre, principio):
         self.nombre = nombre
@@ -19,10 +13,11 @@ class EntidadCausal:
 
     def generar_tesis(self, pregunta):
         prompt = (
-            f"Actúa como la entidad {self.nombre}, guiada por el principio {self.principio}. "
-            f"Responde a la pregunta de forma clara y lógica.\n\n"
+            f"Actúa como la entidad ({self.nombre}), guiada por el principio ({self.principio}). "
+            f"Responde de forma clara y lógica a la siguiente pregunta:\n\n"
             f"Pregunta: {pregunta}"
         )
+
         model = genai.GenerativeModel("gemini-1.5-flash")
         respuesta = model.generate_content(prompt)
         return respuesta.text.strip()
@@ -32,22 +27,26 @@ CRONO = EntidadCausal("CRONO", "tiempo y consecuencia")
 AEON = EntidadCausal("AEON", "equilibrio y permanencia")
 MOROS = EntidadCausal("MOROS", "inevitabilidad y destino")
 
-# === 4. Debate lógico ===
+# === 4. Función de debate lógico ===
 def debate_logico(pregunta):
-    t_crono = CRONO.generar_tesis(pregunta)
-    t_aeon = AEON.generar_tesis(pregunta)
-    t_moros = MOROS.generar_tesis(pregunta)
-
     return {
         "pregunta": pregunta,
-        "CRONO": t_crono,
-        "AEON": t_aeon,
-        "MOROS": t_moros
+        "CRONO": CRONO.generar_tesis(pregunta),
+        "AEON": AEON.generar_tesis(pregunta),
+        "MOROS": MOROS.generar_tesis(pregunta)
     }
 
-# === 5. Servidor Flask para Render ===
+# === 5. Servidor Flask ===
 app = Flask(__name__)
 
-@app.route('/')
+@app.route("/", methods=["GET", "POST"])
 def home():
-    return "🤖 PECA: Sistema de Debate Lógico entre humanos e IA"
+    if request.method == "POST":
+        pregunta = request.form["pregunta"]
+        resultado = debate_logico(pregunta)
+        return render_template("index.html", resultado=resultado)
+    return render_template("index.html", resultado=None)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=10000)
+
