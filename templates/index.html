@@ -1,66 +1,46 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Debate Lógico IA</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f6f8;
-      margin: 0;
-      padding: 20px;
-      text-align: center;
-    }
-    h1 {
-      color: #333;
-    }
-    form {
-      margin-top: 20px;
-    }
-    input[type="text"] {
-      padding: 10px;
-      width: 60%;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-    button {
-      padding: 10px 20px;
-      margin-left: 10px;
-      background-color: #4CAF50;
-      border: none;
-      color: white;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    .respuesta {
-      margin-top: 30px;
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      text-align: left;
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debate Lógico</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            text-align: center;
+            padding: 50px;
+        }
+        h1 {
+            color: #222;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-  <h1>💭 Debate Lógico entre Humanos e IA</h1>
-  <form action="/debate" method="post">
-    <input type="text" name="pregunta" placeholder="Escribe una pregunta para debatir..." required>
-    <button type="submit">Iniciar Debate</button>
-  </form>
-
-  {% if respuesta %}
-  <div class="respuesta">
-    <h2>Respuesta del Sistema:</h2>
-    <p>{{ respuesta }}</p>
-  </div>
-  {% endif %}
+    <div class="container">
+        <h1>Bienvenido a Debate Lógico 🧠</h1>
+        <p>Una app para practicar el pensamiento crítico y la argumentación.</p>
+        <button onclick="alert('Pronto podrás iniciar un debate!')">Iniciar Debate</button>
+    </div>
 </body>
 </html>
