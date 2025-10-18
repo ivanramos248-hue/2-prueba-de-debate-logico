@@ -1,7 +1,9 @@
 services:
   - type: web
-    name: debate-logico
+    name: peca-cosmico
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn main:app
-    plan: free
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
