@@ -1,97 +1,69 @@
-# === PECA_ENGINE (Motor de Debate Causal Real) ===
-# === PECA_ENGINE (Motor de Debate Causal Real) ===
+# peca_engine/engine.py
+import os
 import re
 import google.generativeai as genai
-import os
 
-# Configurar la API de Gemini desde las variables de entorno (Render + Environment)
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+API_KEY = os.getenv("GEMINI_API_KEY")
+if not API_KEY:
+    raise EnvironmentError("La variable GEMINI_API_KEY no está definida en el entorno.")
 
+client = genai.Client(api_key=API_KEY)
+MODEL = "gemini-2.5-flash"
 
-# === 1. ENTIDADES CAUSALES ===
 class EntidadCausal:
-    def __init__(self, self_id, nombre, principio):
-        self.id = self_id
+    def __init__(self, id_name, nombre, principio):
+        self.id = id_name
         self.nombre = nombre
         self.principio = principio
 
-    def generar_prompt(self, pregunta, contexto=""):
-        """Genera la tesis inicial de la entidad basada en su principio."""
+    def generar_prompt_tesis(self, pregunta):
         return (
-            f"Soy {self.nombre}. Mi principio rector es: '{self.principio}'. "
-            f"Debato sobre: '{pregunta}'. "
-            f"{contexto} "
-            "Ofreceré un razonamiento breve y lógico que respalde mi postura.\n"
+            f"Actúa como la entidad '{self.nombre}' cuyo principio es '{self.principio}'.\n"
+            f"Genera una tesis breve sobre: \"{pregunta}\".\n"
+            f"Usa el formato exacto: [TESIS {self.nombre.upper()}] ... [FIN TESIS {self.nombre.upper()}]."
         )
 
-
-# === 2. CONFIGURAR ENTIDADES ===
-CRONO = EntidadCausal("CRONO", "CRONO", "Máxima Causalidad y Mínima Fricción del Tiempo (MCT)")
-AEON = EntidadCausal("AEON", "AEON", "Ley de Reversibilidad Identitaria (LRI)")
-MOROS = EntidadCausal("MOROS", "MOROS", "Ley de Transferencia de Memoria Causal (LTMC)")
+CRONO = EntidadCausal("crono", "CRONO", "Máxima Causalidad y Mínima Fricción")
+AEON  = EntidadCausal("aeon",  "AEON",  "Ley de Reversibilidad Entrópica (LRE)")
+MOROS = EntidadCausal("moros", "MOROS", "Ley de Transferencia de Memoria Causal (LTMC)")
 
 ENTIDADES = [CRONO, AEON, MOROS]
 
+def extraer_tesis(texto):
+    resultados = {}
+    for ent in ENTIDADES:
+        patron = re.compile(rf"\[TESIS {ent.nombre.upper()}\](.*?)\[FIN TESIS {ent.nombre.upper()}\]", re.S)
+        m = patron.search(texto)
+        if m:
+            resultados[ent.nombre] = m.group(1).strip()
+    return resultados
 
-# === 3. FUNCIONES AUXILIARES ===
-def generar_respuesta(entidad, cliente, pregunta, contexto=""):
-    """Llama a la API de Gemini para generar una respuesta de la entidad."""
-    prompt = entidad.generar_prompt(pregunta, contexto)
-    try:
-        response = cliente.models.generate_content(
-            model="gemini-1.5-flash",
-            contents=prompt
-        )
-        return response.text.strip()
-    except APIError as e:
-        return f"[Error con {entidad.nombre}: {e}]"
+def generar_contenido(prompt):
+    resp = client.models.generate_content(model=MODEL, contents=prompt)
+    return getattr(resp, "text", str(resp)).strip()
 
-
-def construir_dialogo(pregunta, respuestas_previas):
-    """Crea un resumen de las respuestas anteriores para contextualizar la conversación."""
-    contexto = "Resumen del debate hasta ahora:\n"
-    for entidad, respuesta in respuestas_previas.items():
-        contexto += f"{entidad}: {respuesta}\n"
-    contexto += "\nResponde con base en este contexto y añade tu razonamiento.\n"
-    return contexto
-
-
-# === 4. FUNCIÓN PRINCIPAL ===
 def iniciar_red_de_debate(pregunta):
-    """Ejecuta el ciclo completo del debate causal entre las tres entidades."""
-    cliente = genai.Client(api_key="AIZAisyCvAk9URpRWuQfoQBeBR_cS6fFmmt7DRVU")  # 👈 Tu API Key
-
-    debate = {}
-    contexto = ""
-
-    # Paso 1: cada entidad da su postura inicial
-    for entidad in ENTIDADES:
-        debate[entidad.nombre] = generar_respuesta(entidad, cliente, pregunta, contexto)
-        contexto = construir_dialogo(pregunta, debate)
-
-    # Paso 2: generación de conclusión final consensuada
+    if not pregunta:
+        raise ValueError("Debes escribir una pregunta.")
+    
+    # 1. Generar tesis individuales
+    raw_tesis = {}
+    for ent in ENTIDADES:
+        prompt = ent.generar_prompt_tesis(pregunta)
+        raw_tesis[ent.nombre] = generar_contenido(prompt)
+    
+    ensamblado = "\n".join(raw_tesis.values())
+    tesis = extraer_tesis(ensamblado)
+    for ent in ENTIDADES:
+        if ent.nombre not in tesis:
+            tesis[ent.nombre] = raw_tesis[ent.nombre]
+    
+    # 2. Pedir convergencia final
     prompt_final = (
-        "Tres inteligencias (CRONO, AEON y MOROS) han debatido sobre una pregunta. "
-        "A continuación se resumen sus respuestas:\n\n"
-        f"{contexto}\n"
-        "Ahora, como moderador neutral, sintetiza sus ideas en una conclusión final "
-        "que refleje los puntos de coincidencia más profundos y lógicos entre las tres posturas."
+        f"Estas son las tesis sobre '{pregunta}'. Refútalas y unifica las ideas.\n\n"
+        f"{ensamblado}\n\n"
+        f"Escribe al final: 🚀 CONVERGENCIA CAUSAL (PECA) FINAL: <conclusión>"
     )
-
-    try:
-        conclusion = cliente.models.generate_content(
-            model="gemini-1.5-flash",
-            contents=prompt_final
-        )
-        conclusion_texto = conclusion.text.strip()
-    except APIError as e:
-        conclusion_texto = f"[Error al generar la conclusión: {e}]"
-
-    # Paso 3: devolver el resultado completo
-    resultado = {
-        "pregunta": pregunta,
-        "respuestas": debate,
-        "conclusion": conclusion_texto
-    }
-    return resultado
-
+    conclusion = generar_contenido(prompt_final)
+    
+    return {"pregunta": pregunta, "tesis_parsed": tesis, "conclusion_raw": conclusion, "raw_tesis": raw_tesis}
