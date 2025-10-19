@@ -17,7 +17,8 @@ def index():
 
         try:
             # Modelo actualizado
-            modelo = genai.GenerativeModel("gemini-1.5-flash-latest")
+           modelo = genai.GenerativeModel("gemini-pro")
+
 
             # Prompt del debate cósmico
             prompt = f"""
