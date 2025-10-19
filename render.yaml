@@ -1,6 +1,10 @@
 services:
   - type: web
-    name: debate-logico
+    name: two-prueba-de-debate-logico
     env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn main:app
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python main.py"
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
