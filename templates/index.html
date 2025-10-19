@@ -1,42 +1,41 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Debate Cósmico Lógico ✨</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Debate Cósmico Lógico</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="nebula"></div>
+  <div class="container">
+    <h1>💫 Debate Cósmico Lógico 💫</h1>
+    <p>Participa en un debate entre las entidades del universo: razón, intuición e innovación.</p>
 
-    <div class="container">
-        <h1>💫 Debate Cósmico Lógico 💫</h1>
-        <p class="intro">
-            Participa en un debate entre las entidades del universo: razón, intuición e innovación.  
-            Escribe un tema y observa cómo el cosmos responde.
-        </p>
+    <input type="text" id="tema" placeholder="Introduce el tema del debate..." />
+    <button id="iniciar">Iniciar Debate 🪐</button>
 
-        <form method="POST">
-            <input type="text" name="tema" placeholder="Introduce el tema del debate..." required>
-            <button type="submit">Iniciar Debate 🌌</button>
-        </form>
+    <div id="resultado"></div>
+  </div>
 
-        {% if debate %}
-        <div class="debate">
-            <h2>🪐 Resultado del Debate:</h2>
-            <p>{{ debate | safe }}</p>
-        </div>
-        {% endif %}
+  <script>
+    document.getElementById("iniciar").addEventListener("click", async () => {
+      const tema = document.getElementById("tema").value.trim();
+      const resultadoDiv = document.getElementById("resultado");
+      resultadoDiv.textContent = "Cargando debate cósmico... 🌌";
 
-        {% if error %}
-        <div class="error">
-            ⚠️ Error: {{ error }}
-        </div>
-        {% endif %}
-    </div>
+      try {
+        const respuesta = await fetch("/api/debate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tema })
+        });
 
-    <footer>
-        <p>Creado con 💫 energía estelar y Flask 🚀</p>
-    </footer>
+        const datos = await respuesta.json();
+        resultadoDiv.textContent = datos.resultado || datos.error;
+      } catch (error) {
+        resultadoDiv.textContent = "Error al conectar con el servidor.";
+      }
+    });
+  </script>
 </body>
 </html>
