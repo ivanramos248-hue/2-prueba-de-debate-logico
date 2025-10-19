@@ -1,21 +1,24 @@
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, request, send_from_directory
 
 app = Flask(__name__)
 
-# Página principal (sirve index.html desde /static)
 @app.route('/')
-def index():
+def home():
+    # Renderiza el index.html desde /static
     return send_from_directory('static', 'index.html')
 
-# Página del debate (usa templates/debate.html)
-@app.route('/debate')
+@app.route('/debate', methods=['GET', 'POST'])
 def debate():
-    return render_template('debate.html')
+    respuesta = None
+    if request.method == 'POST':
+        argumento = request.form.get('argumento')
+        # Aquí puedes agregar tu lógica del "motor del debate"
+        respuesta = f"Interesante punto: {argumento}"
+    return render_template('debate.html', respuesta=respuesta)
 
-# Prueba básica
 @app.route('/ping')
 def ping():
-    return "Servidor activo 🚀"
+    return "Pong! ✅"
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=10000)
