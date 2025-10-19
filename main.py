@@ -1,17 +1,23 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 import google.generativeai as genai
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static", static_url_path="")
 CORS(app)
 
 # Configurar la API key desde variables de entorno
 genai.configure(api_key=os.getenv("API_KEY_GEMINI"))
 
-# Crear el modelo Gemini
+# Crear el modelo
 modelo = genai.GenerativeModel("gemini-1.5-flash")
 
+# Ruta principal para servir el index.html
+@app.route("/")
+def home():
+    return send_from_directory("static", "index.html")
+
+# Ruta para el debate
 @app.route("/debate", methods=["POST"])
 def debate():
     try:
@@ -25,6 +31,7 @@ def debate():
         return jsonify({"respuesta": respuesta.text})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
