@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: two-prueba-de-debate-logico
+    name: debate-logico
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn main:app
