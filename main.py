@@ -4,37 +4,41 @@ import os
 
 app = Flask(__name__)
 
-# Configura tu API key de Gemini
-genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
+# Configura tu API Key de Gemini
+genai.configure(api_key=os.environ.get("API_KEY_GEMINI"))
+
+# Usa el modelo actualizado
+modelo = genai.GenerativeModel("gemini-1.5-flash-latest")
 
 @app.route("/")
-def home():
+def index():
     return render_template("index.html")
 
-@app.route("/api/debate", methods=["POST"])
+@app.route("/debate", methods=["POST"])
 def debate():
+    data = request.get_json()
+    tema = data.get("tema", "")
+
+    if not tema:
+        return jsonify({"error": "Por favor ingresa un tema para debatir."}), 400
+
+    prompt = f"""
+    Inicia un debate lógico y creativo entre tres entidades del universo:
+    - Razón
+    - Intuición
+    - Innovación
+
+    Tema del debate: {tema}
+
+    Presenta el intercambio como si fuera una conversación fluida, con ideas contrastantes.
+    """
+
     try:
-        data = request.get_json()
-        tema = data.get("tema", "")
-
-        if not tema:
-            return jsonify({"error": "Por favor ingresa un tema válido."}), 400
-
-        # Usa el modelo correcto de Gemini
-       modelo = genai.GenerativeModel("gemini-1.5-flash-latest")
-
-        prompt = f"""
-        Imagina un debate cósmico entre tres entidades del universo:
-        🧠 Razón, 💫 Intuición y 🔥 Innovación.
-        Tema del debate: {tema}.
-        Cada entidad debe responder con una perspectiva breve, poética y única.
-        """
-
         respuesta = modelo.generate_content(prompt)
-        return jsonify({"resultado": respuesta.text})
-
+        return jsonify({"respuesta": respuesta.text})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.0", port=10000)
