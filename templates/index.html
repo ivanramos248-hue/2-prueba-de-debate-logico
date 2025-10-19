@@ -1,26 +1,42 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🌌 Debate Cósmico - PECA</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debate Cósmico Lógico ✨</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <div class="nebulosa"></div>
-  <div class="contenedor">
-    <h1>🌠 Debate Cósmico</h1>
-    <form method="POST">
-      <input type="text" name="tema" placeholder="Escribe un tema profundo..." required>
-      <button type="submit">Iniciar Debate</button>
-    </form>
+    <div class="nebula"></div>
 
-    {% if debate %}
-    <div class="debate">
-      <h2>✨ Resultado del Debate</h2>
-      <p>{{ debate|safe }}</p>
+    <div class="container">
+        <h1>💫 Debate Cósmico Lógico 💫</h1>
+        <p class="intro">
+            Participa en un debate entre las entidades del universo: razón, intuición e innovación.  
+            Escribe un tema y observa cómo el cosmos responde.
+        </p>
+
+        <form method="POST">
+            <input type="text" name="tema" placeholder="Introduce el tema del debate..." required>
+            <button type="submit">Iniciar Debate 🌌</button>
+        </form>
+
+        {% if debate %}
+        <div class="debate">
+            <h2>🪐 Resultado del Debate:</h2>
+            <p>{{ debate | safe }}</p>
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <div class="error">
+            ⚠️ Error: {{ error }}
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
-  </div>
+
+    <footer>
+        <p>Creado con 💫 energía estelar y Flask 🚀</p>
+    </footer>
 </body>
 </html>
