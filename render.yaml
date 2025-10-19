@@ -1,7 +1,6 @@
 services:
   - type: web
-    name: debate-cosmico
+    name: 2-prueba-de-debate-logico
     env: python
     buildCommand: ""
-    startCommand: "gunicorn main:app"
-    plan: free
+    startCommand: gunicorn main:app
