@@ -1,228 +1,113 @@
-/* ======================================================
-   style.css - Estética cósmica completa para Debate Lógico
-   Ruta sugerida: static/style.css
-   ====================================================== */
-
-/* Reset / base */
-* { box-sizing: border-box; }
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
-  color: #e6f7ff;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+/* Fondo cósmico animado */
+body {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+    background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
 }
 
-/* --- Nebulosa animada (fondo) --- */
-.nebulosa {
-  position: fixed;
-  left: -25%;
-  top: -25%;
-  width: 150%;
-  height: 150%;
-  pointer-events: none;
-  z-index: 0;
-  background:
-    radial-gradient(circle at 20% 30%, rgba(97,0,255,0.18) 0%, rgba(97,0,255,0.06) 15%, transparent 30%),
-    radial-gradient(circle at 80% 20%, rgba(0,170,255,0.14) 0%, rgba(0,170,255,0.04) 18%, transparent 35%),
-    radial-gradient(circle at 50% 80%, rgba(255,0,220,0.12) 0%, rgba(255,0,220,0.03) 20%, transparent 40%);
-  filter: blur(60px);
-  animation: flotar 28s ease-in-out infinite alternate;
-  opacity: 0.95;
+.nebula {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 30% 50%, rgba(255,0,150,0.2), transparent 60%),
+                radial-gradient(circle at 70% 60%, rgba(0,200,255,0.2), transparent 70%),
+                radial-gradient(circle at 50% 80%, rgba(255,255,255,0.1), transparent 80%);
+    filter: blur(40px);
+    animation: float 25s infinite alternate ease-in-out;
+    z-index: -1;
 }
 
-@keyframes flotar {
-  0%   { transform: translate(0px, 0px) scale(1); }
-  50%  { transform: translate(-80px, 40px) scale(1.05); }
-  100% { transform: translate(0px, 80px) scale(1.08); }
+@keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(30px, -20px) scale(1.1); }
+    100% { transform: translate(-30px, 20px) scale(1); }
 }
 
-/* --- Contenedor principal --- */
-.contenedor {
-  position: relative;
-  z-index: 10;
-  max-width: 1100px;
-  margin: 6vh auto;
-  padding: 40px;
-  text-align: center;
+/* Contenedor principal */
+.container {
+    text-align: center;
+    padding: 60px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 20px;
+    max-width: 700px;
+    margin: 80px auto;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
 }
 
-/* --- Tarjeta principal --- */
-.card {
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border-radius: 14px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255,255,255,0.02);
-  padding: 36px;
-  color: #d9fbff;
-  border: 1px solid rgba(255,255,255,0.04);
+/* Título */
+h1 {
+    font-size: 2.5em;
+    text-shadow: 0 0 15px #7df9ff, 0 0 25px #b621fe;
 }
 
-/* --- Encabezado --- */
-.brand {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 18px;
+/* Texto introductorio */
+.intro {
+    font-size: 1.1em;
+    color: #ddd;
+    margin-bottom: 20px;
 }
 
-.brand h1 {
-  margin: 0;
-  font-size: 2.2rem;
-  color: #72f1ff;
-  letter-spacing: 0.6px;
-  text-shadow: 0 0 10px rgba(114,241,255,0.25), 0 0 24px rgba(0,170,255,0.08);
+/* Formulario */
+form {
+    margin: 20px 0;
 }
 
-.brand .emoji {
-  font-size: 1.6rem;
-  transform: translateY(-2px);
+input[type="text"] {
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    width: 70%;
+    max-width: 400px;
+    outline: none;
+    font-size: 1em;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
 }
 
-/* --- Subtítulo --- */
-.subtitle {
-  margin: 6px 0 24px 0;
-  font-size: 0.95rem;
-  color: rgba(220,255,255,0.85);
+button {
+    padding: 12px 20px;
+    border: none;
+    background: linear-gradient(45deg, #ff007f, #7a00ff);
+    color: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.3s ease, background 0.3s ease;
 }
 
-/* --- Formulario de tema --- */
-.form-row {
-  display: flex;
-  justify-content: center;
-  gap: 18px;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  margin-top: 12px;
+button:hover {
+    transform: scale(1.05);
+    background: linear-gradient(45deg, #00f0ff, #ff00aa);
 }
 
-textarea#tema {
-  width: 72%;
-  min-width: 280px;
-  max-width: 760px;
-  height: 120px;
-  padding: 16px 18px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.06);
-  background: rgba(255,255,255,0.02);
-  color: #eafcff;
-  font-size: 1rem;
-  resize: vertical;
-  outline: none;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.45);
-  transition: transform .18s ease, background .18s ease;
-  backdrop-filter: blur(6px);
+/* Resultado del debate */
+.debate {
+    margin-top: 30px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
 }
 
-textarea#tema:focus {
-  transform: translateY(-4px);
-  background: rgba(255,255,255,0.035);
-  border-color: rgba(114,241,255,0.25);
+/* Mensaje de error */
+.error {
+    margin-top: 20px;
+    color: #ff6b6b;
+    font-weight: bold;
 }
 
-/* --- Botón principal --- */
-.btn {
-  display: inline-block;
-  background: linear-gradient(180deg, #00ffc8, #00e6b0);
-  border: none;
-  color: #041018;
-  font-weight: 600;
-  padding: 12px 22px;
-  border-radius: 10px;
-  cursor: pointer;
-  box-shadow: 0 6px 18px rgba(0,200,160,0.12), 0 2px 6px rgba(0,0,0,0.45);
-  transition: transform .15s ease, box-shadow .15s ease;
-  margin-top: 6px;
+/* Pie de página */
+footer {
+    position: fixed;
+    bottom: 10px;
+    width: 100%;
+    text-align: center;
+    color: #aaa;
+    font-size: 0.9em;
 }
-
-.btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 30px rgba(0,200,160,0.16); }
-.btn:active { transform: translateY(-1px); }
-
-/* --- Área de resultados / debate --- */
-.resultado {
-  margin: 28px auto 0 auto;
-  padding: 22px;
-  width: 80%;
-  max-width: 980px;
-  border-radius: 12px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0.01));
-  border: 1px solid rgba(255,255,255,0.03);
-  color: #d2fbff;
-  text-align: left;
-  box-shadow: 0 8px 30px rgba(3,10,15,0.6);
-  backdrop-filter: blur(8px);
-}
-
-/* Cada entidad (tarjetas internas) */
-.entidad {
-  padding: 14px;
-  border-radius: 10px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  margin-bottom: 12px;
-  border: 1px solid rgba(255,255,255,0.02);
-}
-
-.entidad h3 {
-  margin: 0 0 6px 0;
-  font-size: 1.05rem;
-  color: #a6ffff;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.entidad p {
-  margin: 0;
-  color: #cfeffc;
-  line-height: 1.45;
-  font-size: 0.98rem;
-}
-
-/* Conclusión final destacada */
-.conclusion {
-  margin-top: 14px;
-  padding: 14px;
-  border-radius: 10px;
-  background: linear-gradient(90deg, rgba(0,255,200,0.04), rgba(114,241,255,0.02));
-  color: #001b1b;
-  font-weight: 700;
-  text-align: center;
-  border: 1px solid rgba(0,255,200,0.07);
-  background-clip: padding-box;
-}
-
-/* --- Mensajes de error / info --- */
-.alert {
-  margin-top: 16px;
-  padding: 12px;
-  border-radius: 8px;
-  background: rgba(255, 80, 80, 0.08);
-  color: #ffd6d6;
-  border: 1px solid rgba(255, 80, 80, 0.12);
-}
-
-/* --- Pequeños detalles visuales --- */
-.small {
-  font-size: 0.86rem;
-  color: rgba(230,255,255,0.7);
-}
-
-/* --- Responsive --- */
-@media (max-width: 880px) {
-  textarea#tema { width: 92%; height: 110px; }
-  .resultado { width: 92%; padding: 18px; }
-  .card { padding: 26px; }
-  .brand h1 { font-size: 1.6rem; }
-}
-
-@media (max-width: 480px) {
-  .brand { gap: 8px; }
-  .brand h1 { font-size: 1.25rem; }
-  .btn { padding: 10px 16px; font-size: 0.95rem; }
-  textarea#tema { height: 95px; }
-}
-
