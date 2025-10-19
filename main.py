@@ -14,7 +14,7 @@ def index():
         tema = request.form["tema"]
 
         # Cambiamos la forma de llamar al modelo (API actualizada)
-        modelo = genai.GenerativeModel("models/gemini-1.5-flash")
+      modelo = genai.GenerativeModel("gemini-1.5-flash-latest")
 
         prompt = f"""
         Eres el moderador de un debate cósmico entre tres entidades de sabiduría universal:
