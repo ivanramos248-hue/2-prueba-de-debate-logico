@@ -21,7 +21,7 @@ def debate():
             return jsonify({"error": "Por favor ingresa un tema válido."}), 400
 
         # Usa el modelo correcto de Gemini
-        modelo = genai.GenerativeModel("gemini-1.5-flash")
+       modelo = genai.GenerativeModel("gemini-1.5-flash-latest")
 
         prompt = f"""
         Imagina un debate cósmico entre tres entidades del universo:
