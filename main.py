@@ -1,38 +1,16 @@
-from flask import Flask, request, jsonify, send_from_directory
-from flask_cors import CORS
-import os
-import google.generativeai as genai
+from flask import Flask, send_from_directory, render_template
 
-app = Flask(__name__, static_folder="static", static_url_path="")
-CORS(app)
+app = Flask(__name__)
 
-# Configurar la API key desde variables de entorno
-genai.configure(api_key=os.getenv("API_KEY_GEMINI"))
+# Ruta principal que sirve el index.html desde /static
+@app.route('/')
+def index():
+    return send_from_directory('static', 'index.html')
 
-# Crear el modelo
-modelo = genai.GenerativeModel("gemini-1.5-flash")
-
-# Ruta principal para servir el index.html
-@app.route("/")
-def home():
-    return send_from_directory("static", "index.html")
-
-# Ruta para el debate
-@app.route("/debate", methods=["POST"])
+# Ruta para el debate (si existe)
+@app.route('/debate')
 def debate():
-    try:
-        data = request.get_json()
-        tema = data.get("tema", "")
-        if not tema:
-            return jsonify({"error": "Tema no proporcionado"}), 400
+    return render_template('debate.html')
 
-        prompt = f"Organiza un debate entre Razón, Intuición e Innovación sobre: {tema}"
-        respuesta = modelo.generate_content(prompt)
-        return jsonify({"respuesta": respuesta.text})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
