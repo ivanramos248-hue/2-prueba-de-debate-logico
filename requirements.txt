@@ -1,2 +1,4 @@
 Flask==3.0.3
-gunicorn==23.0.0
+gunicorn==23.1.0
+google-generativeai>=0.9.0    # Asegura la instalación del SDK de Gemini
+# openai==1.42.0              # Puedes eliminar esta línea si ya no usas OpenAI
