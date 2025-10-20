@@ -4,20 +4,19 @@ from flask import Flask, render_template, request, jsonify, send_from_directory
 import os
 import traceback
 import sys
-
-# Intenta importar el SDK de Gemini (si no está, fallará, pero usamos try/except)
+# Importa el SDK de Gemini
 try:
     import google.generativeai as genai
 except ImportError:
     genai = None
 
-# No necesitamos el SDK de OpenAI si nos enfocamos solo en Gemini
+# OpenAI se deshabilita para enfocarnos en Gemini
 openai = None 
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 
 # -------------------------------------------------------
-# Helper: generar texto usando Gemini (si está disponible)
+# Helper: generar texto usando Gemini
 # -------------------------------------------------------
 def generar_con_gemini(prompt: str):
     if genai is None:
@@ -29,24 +28,26 @@ def generar_con_gemini(prompt: str):
     
     genai.configure(api_key=api_key)
     
-    # Modelos: Intentamos el más reciente y robusto para este tipo de tarea estructurada
-    # Usamos 1024 tokens para asegurar que el debate se complete.
+    # Modelos: Intentamos gemini-1.5-flash (el más capaz) y luego gemini-pro (el estándar)
+    # 1024 tokens asegura espacio para el debate completo.
     MAX_TOKENS = 1024
     
-    for model_name in ("gemini-2.5-flash", "gemini-1.5-flash", "gemini-pro"):
+    # Lista de modelos ajustada: 1.5-flash y luego pro
+    for model_name in ("gemini-1.5-flash", "gemini-pro"): 
         try:
-            resp = genai.GenerativeModel(model=model_name).generate_content(
+            # Crea el cliente del modelo
+            model = genai.GenerativeModel(model_name=model_name)
+            
+            # Genera el contenido con la configuración de tokens
+            resp = model.generate_content(
                 contents=prompt,
-                config=genaie.types.GenerateContentConfig(
+                config=genai.types.GenerateContentConfig(
                     max_output_tokens=MAX_TOKENS
                 )
             )
             
-            # El campo .text siempre es la respuesta de texto.
-            if hasattr(resp, "text"):
-                return resp.text
-            
-            return str(resp)
+            # Devuelve el texto generado
+            return resp.text
         
         except Exception as e:
             # Captura y registra el error para el siguiente intento
@@ -65,7 +66,7 @@ def index():
 
 @app.route("/debate", methods=["GET", "POST"])
 def debate_page():
-    # Detecta si la petición es un formulario tradicional (GET/POST) o AJAX (JSON)
+    # Detecta si la petición es un formulario tradicional o AJAX
     tema = None
     is_json = request.is_json
     
@@ -78,7 +79,7 @@ def debate_page():
         return render_template("debate.html")
     
     if not tema:
-        # Respuesta de error adaptada al tipo de solicitud (HTML para formularios, JSON para AJAX)
+        # Respuesta de error adaptada al tipo de solicitud
         if is_json:
             return jsonify({"error": "Por favor escribe un tema."}), 400
         else:
@@ -104,25 +105,25 @@ def debate_page():
         # 1. Intentar con Gemini
         if os.getenv("GEMINI_API_KEY") and genai is not None:
             resultado = generar_con_gemini(prompt)
+            # Si tiene éxito, devuelve el resultado
             return render_template("debate.html", respuesta=resultado)
     except Exception as e:
         last_error = f"ERROR GEMINI: {e}"
-        # Continuar al modo demo
+        # Continuar al modo demo si falla
 
     # 2. Modo demo: respuesta simulada si no hay clave o si falló la API
-    if not resultado:
-        demo = (
-            "[RAZON]\nLa mejor estrategia es analizar datos y priorizar eficiencia.\n\n"
-            "[INTUICION]\nSiento que la adaptabilidad y el contexto humano son clave.\n\n"
-            "[INNOVACION]\nPropondría un experimento rápido para validar las ideas.\n\n"
-            "[CONCLUSION]\nIntegrando razonamiento, intuición e innovación, lo óptimo es iterar rápidamente con métricas claras."
-        )
-        
-        # Si hubo errores, los añadimos al final para el desarrollador
-        if last_error:
-            demo += f"\n\n--- MODO DEMO | Error de conexión (revisa tu clave): {last_error}"
-        
-        return render_template("debate.html", respuesta=demo)
+    demo = (
+        "[RAZON]\nLa mejor estrategia es analizar datos y priorizar eficiencia.\n\n"
+        "[INTUICION]\nSiento que la adaptabilidad y el contexto humano son clave.\n\n"
+        "[INNOVACION]\nPropondría un experimento rápido para validar las ideas.\n\n"
+        "[CONCLUSION]\nIntegrando razonamiento, intuición e innovación, lo óptimo es iterar rápidamente con métricas claras."
+    )
+    
+    # Si hubo errores, los añadimos para el desarrollador
+    if last_error:
+        demo += f"\n\n--- MODO DEMO | Error de conexión (revisa tu clave): {last_error}"
+    
+    return render_template("debate.html", respuesta=demo)
 
 @app.route("/ping", methods=["GET"])
 def ping():
@@ -130,5 +131,6 @@ def ping():
 
 # run
 if __name__ == "__main__":
+    # Usa un puerto por defecto (10000) o el definido por el entorno (Render)
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
